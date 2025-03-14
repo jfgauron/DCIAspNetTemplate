@@ -4,7 +4,7 @@
     <!-- The package metadata. Fill in the properties marked as TODO below -->
     <!-- Follow the instructions on https://learn.microsoft.com/en-us/nuget/create-packages/package-authoring-best-practices -->
     <PackageId>DCIAspNetTemplates</PackageId>
-    <PackageVersion>2.0.0</PackageVersion>
+    <PackageVersion>2.1.0</PackageVersion>
     <Title>DCI ASP.NET template</Title>
     <Authors>Jean-Frederic Gauron</Authors>
     <Description>A ready-made REST API project with Clean Architecture</Description>
