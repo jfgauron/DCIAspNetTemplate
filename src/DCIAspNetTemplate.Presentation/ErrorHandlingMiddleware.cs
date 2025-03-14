@@ -6,10 +6,16 @@ using Newtonsoft.Json;
 
 namespace DCIAspNetTemplate.Presentation;
 
-public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
+public class ErrorHandlingMiddleware
 {
-    private readonly RequestDelegate _next = next;
-    private readonly ILogger<ErrorHandlingMiddleware> _logger = logger;
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ErrorHandlingMiddleware> _logger;
+
+    public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
+    {
+      _next = next;
+      _logger = logger;
+    }
 
     private readonly Dictionary<Type, Func<HttpContext, Exception, Task>> _exceptionHandlers = new()
     {

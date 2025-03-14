@@ -7,10 +7,11 @@ ENV SHELL /bin/bash
 RUN userdel -r ubuntu
 
 # Install commons
-RUN apt update && apt install -y git curl
+RUN apt update && apt install -y git curl software-properties-common
 
 # Install csharp
-RUN apt install -y dotnet-sdk-8.0
+RUN add-apt-repository ppa:dotnet/backports
+RUN apt install -y dotnet-sdk-9.0 dotnet-sdk-8.0 dotnet-sdk-6.0
 RUN dotnet tool install --global dotnet-ef
 
 # Setup default user
