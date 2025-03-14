@@ -1,27 +1,31 @@
 using System.Net;
+using DCIAspNetTemplate.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace DCIAspNetTemplate.Presentation;
 
-public class ErrorHandlingMiddleware
+public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
+    private readonly RequestDelegate _next = next;
+    private readonly ILogger<ErrorHandlingMiddleware> _logger = logger;
 
-    public ErrorHandlingMiddleware(RequestDelegate next)
+    private readonly Dictionary<Type, Func<HttpContext, Exception, Task>> _exceptionHandlers = new()
     {
-      _next = next;
-    }
+      { typeof(BusinessLogicException), HandleBadRequestException },
+      { typeof(ResourceNotFoundException), HandleNotFoundException }
+    };
 
-    public async Task InvokeAsync(HttpContext context)
+  public async Task InvokeAsync(HttpContext context)
     {
       try
       {
         await _next(context);
       }
-      catch (InvalidOperationException ex)
+      catch (Exception ex) when (_exceptionHandlers.TryGetValue(ex.GetType(), out var handler))
       {
-        await HandleBadRequestException(context, ex);
+        await handler(context, ex);
       }
       catch (Exception ex)
       {
@@ -29,29 +33,37 @@ public class ErrorHandlingMiddleware
       }
     }
 
-    private Task HandleBadRequestException(HttpContext context, Exception exception)
+    private static Task HandleException(HttpContext context, String message, int code)
     {
       context.Response.ContentType = "application/json";
-      context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+      context.Response.StatusCode = code;
 
       var errorResponse = new
       {
-        Message = exception.Message
+        Message = message
       };
 
       return context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
     }
 
+    private static Task HandleBadRequestException(HttpContext context, Exception exception)
+    {
+      return HandleException(context, exception.Message, (int)HttpStatusCode.BadRequest);
+    }
+
+    private static Task HandleNotFoundException(HttpContext context, Exception exception)
+    {
+      return HandleException(context, exception.Message, (int)HttpStatusCode.NotFound);
+    }
+
     private Task HandleUnknownException(HttpContext context, Exception exception)
     {
-      context.Response.ContentType = "application/json";
-      context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+      _logger.LogError(exception, "An error occurred while processing the request.");
 
-      var errorResponse = new
-      {
-        Message = "An unexpected error occurred."
-      };
-
-      return context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
+      return HandleException(
+        context,
+        "An unexpected error occurred.",
+        (int)HttpStatusCode.InternalServerError
+      );
     }
 }
