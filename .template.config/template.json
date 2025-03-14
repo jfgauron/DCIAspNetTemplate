@@ -7,6 +7,10 @@
   "shortName": "dciAspNetTemplate",
   "sourceName": "DCIAspNetTemplate",
   "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
   "sources":[
     {
       "modifiers":[
