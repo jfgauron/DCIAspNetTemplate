@@ -1,4 +1,3 @@
-using DCIAspNetTemplate.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DCIAspNetTemplate.Presentation;

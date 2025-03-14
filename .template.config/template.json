@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/template",
+  "author": "Jean-Frederic Gauron",
+  "classifications": [ "Solution", "Multi-Project" ],
+  "identity": "DCI.AspNetTemplate",
+  "name": "DCI ASP.NET template for TSE",
+  "shortName": "dciAspNetTemplate",
+  "sourceName": "DCIAspNetTemplate",
+  "preferNameDirectory": true,
+  "sources":[
+    {
+      "modifiers":[
+        {
+          "exclude":[
+            "**/.git/**",
+            "**/*.nuspec"
+          ]
+        }
+      ]
+    }
+ ]
+}
